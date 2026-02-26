@@ -55,27 +55,27 @@ content-flow/
    cd content-flow
    ```
 
-2. **Install dependencies**:
+ 2. **Install dependencies** (new step):
    ```bash
    pipenv install
    ```
 
-3. **Activate the virtual environment**:
+ 3. **Activate the virtual environment**:
    ```bash
    pipenv shell
    ```
 
-4. **Run migrations**:
+ 4. **Run migrations**:
    ```bash
    python manage.py migrate
    ```
 
-5. **Create a superuser (optional)**:
+ 5. **Create a superuser (optional)**:
    ```bash
    python manage.py createsuperuser
    ```
 
-6. **Start the development server**:
+ 6. **Start the development server**:
    ```bash
    python manage.py runserver
    ```
@@ -214,12 +214,10 @@ GET /api/tag/
 ```json
 [
   {
-    "id": 1,
     "name": "Django"
   },
   {
     "id": 2,
-    "name": "Python"
   }
 ]
 ```
@@ -228,7 +226,6 @@ GET /api/tag/
 ```
 POST /api/tag/
 ```
-
 **Request body**:
 ```json
 {
@@ -262,7 +259,6 @@ GET /api/tag/{id}/
 PUT /api/tag/{id}/
 ```
 
-**Request body**:
 ```json
 {
   "name": "Django Framework"
@@ -325,7 +321,6 @@ class tag(models.Model):
 
 ### CustomUser Model
 ```python
-class CustomUser(AbstractUser):
     role              # CharField: "writer" or "editor" (default: "writer")
 ```
 
@@ -348,7 +343,6 @@ curl -X POST http://127.0.0.1:8000/api/content/ \
     "body": "This is my first blog post",
     "author": 1,
     "tags": []
-  }'
 ```
 
 **Update an article**:
@@ -370,7 +364,6 @@ import requests
 
 BASE_URL = "http://127.0.0.1:8000/api"
 
-# List articles
 response = requests.get(f"{BASE_URL}/content/")
 articles = response.json()
 
@@ -390,7 +383,6 @@ update_data = {"status": "published"}
 response = requests.patch(f"{BASE_URL}/content/1/", json=update_data)
 
 # Delete article
-response = requests.delete(f"{BASE_URL}/content/1/")
 ```
 
 ## Configuration
@@ -406,7 +398,6 @@ Key settings in `config/settings.py`:
 ## Development
 
 ### Create a superuser
-```bash
 python manage.py createsuperuser
 ```
 
