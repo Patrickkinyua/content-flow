@@ -1,5 +1,6 @@
 from django.db import models
 from django.conf import settings
+from cloudinary.models import CloudinaryField
 
 
 
@@ -16,6 +17,7 @@ class article(models.Model):
     status = models.CharField(max_length=10, choices=STATUS_CHOICES,default="draft")
     title = models.CharField(max_length=200)
     body = models.TextField()
+    image= CloudinaryField('image', blank=True, null=True)
 
     author = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     tags = models.ManyToManyField(tag, related_name="articles", blank=True)
