@@ -1,7 +1,7 @@
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from django.db.models import Prefetch
-from serializers import CommentSerializer
+from .serializers import CommentSerializer
 from .models import Comment
 from .permissions import IsAuthorOrReadOnly
 
@@ -10,15 +10,20 @@ class CommentViewSet(ModelViewSet):
     permission_classes = [IsAuthenticatedOrReadOnly, IsAuthorOrReadOnly]
 
     def get_queryset(self):
-        return Comment.objects.filter(
+        qs = Comment.objects.filter(
             is_deleted=False,
             parent=None
         ).select_related("author").prefetch_related(
             Prefetch("replies", queryset=Comment.objects.select_related("author"))
         )
+        article_pk = self.kwargs.get("article_pk")
+        if article_pk:
+            qs = qs.filter(article_id=article_pk)
+        return qs
 
     def perform_create(self, serializer):
-        serializer.save(author=self.request.user)
+        article_pk = self.kwargs.get("article_pk")
+        serializer.save(author=self.request.user, article_id=article_pk)
 
     def perform_update(self, serializer):
         serializer.save(is_edited=True)

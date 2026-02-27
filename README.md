@@ -199,6 +199,75 @@ PATCH /api/content/{id}/
 DELETE /api/content/{id}/
 ```
 
+---
+
+### Comments
+
+Nested comment resources are available under articles.
+
+#### List comments for an article
+```
+GET /api/articles/{article_id}/comments/
+```
+
+**Response** (200 OK):
+```json
+[
+  {
+    "id": 1,
+    "article": 1,
+    "author": "john_doe",
+    "parent": null,
+    "content": "Great post!",
+    "is_edited": false,
+    "created_at": "2026-02-27T12:00:00Z",
+    "replies": []
+  }
+]
+```
+
+#### Add a comment to an article
+```
+POST /api/articles/{article_id}/comments/
+```
+
+**Headers**:
+```
+Authorization: Bearer {access_token}
+```
+
+**Request body**:
+```json
+{
+  "content": "This is a comment",
+  "parent": null
+}
+```
+
+**Response** (201 Created): created comment object
+
+#### Reply to a comment
+```
+POST /api/articles/{article_id}/comments/
+```
+
+**Request body**:
+```json
+{
+  "content": "This is a reply",
+  "parent": 1
+}
+```
+
+#### Retrieve, update, delete a single comment
+```
+GET /api/articles/{article_id}/comments/{comment_id}/
+PATCH /api/articles/{article_id}/comments/{comment_id}/
+DELETE /api/articles/{article_id}/comments/{comment_id}/
+```
+
+The usual permission rules apply: only the author can modify or delete their comment; deletion marks it as removed.
+
 **Response** (204 No Content)
 
 ---
@@ -357,6 +426,45 @@ curl -X PATCH http://127.0.0.1:8000/api/content/1/ \
 curl -X DELETE http://127.0.0.1:8000/api/content/1/
 ```
 
+---
+
+### Comment Examples
+
+**List comments for article 1**:
+```bash
+curl http://127.0.0.1:8000/api/articles/1/comments/
+```
+
+**Add a comment**:
+```bash
+curl -X POST http://127.0.0.1:8000/api/articles/1/comments/ \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer YOUR_ACCESS_TOKEN" \
+  -d '{"content": "Great article!"}'
+```
+
+**Reply to comment 1**:
+```bash
+curl -X POST http://127.0.0.1:8000/api/articles/1/comments/ \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer YOUR_ACCESS_TOKEN" \
+  -d '{"content": "Thank you!", "parent": 1}'
+```
+
+**Update a comment**:
+```bash
+curl -X PATCH http://127.0.0.1:8000/api/articles/1/comments/1/ \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer YOUR_ACCESS_TOKEN" \
+  -d '{"content": "Updated text"}'
+```
+
+**Delete a comment**:
+```bash
+curl -X DELETE http://127.0.0.1:8000/api/articles/1/comments/1/ \
+  -H "Authorization: Bearer YOUR_ACCESS_TOKEN"
+```
+
 ### Using Python (requests)
 
 ```python
@@ -383,6 +491,38 @@ update_data = {"status": "published"}
 response = requests.patch(f"{BASE_URL}/content/1/", json=update_data)
 
 # Delete article
+
+# ---
+
+# Comment operations with Python
+
+# List comments for article 1
+response = requests.get(f"{BASE_URL}/articles/1/comments/")
+comments = response.json()
+print("Comments:", comments)
+
+# Add a comment
+comment_data = {"content": "Great article!"}
+headers = {"Authorization": "Bearer YOUR_ACCESS_TOKEN"}
+response = requests.post(f"{BASE_URL}/articles/1/comments/", 
+    headers=headers, json=comment_data)
+print("Created comment:", response.json())
+
+# Reply to a comment
+reply_data = {"content": "Thank you!", "parent": 1}
+response = requests.post(f"{BASE_URL}/articles/1/comments/", 
+    headers=headers, json=reply_data)
+print("Reply:", response.json())
+
+# Update a comment
+update_comment = {"content": "Updated text"}
+response = requests.patch(f"{BASE_URL}/articles/1/comments/1/", 
+    headers=headers, json=update_comment)
+print("Updated comment:", response.json())
+
+# Delete a comment
+response = requests.delete(f"{BASE_URL}/articles/1/comments/1/", headers=headers)
+print("Deleted comment status:", response.status_code)
 ```
 
 ## Configuration
