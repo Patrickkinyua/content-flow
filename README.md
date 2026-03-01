@@ -5,7 +5,8 @@ A RESTful API for managing blog articles and tags, built with Django REST Framew
 ## Overview
 
 Content Flow is a lightweight blog content management system that supports:
-- **Article Management**: Create drafts, publish articles, and manage content
+- **Article Management**: Create drafts, publish articles, manage content, and like/unlike articles
+- **Like System**: Users can like articles and comments; counts and personal like status are exposed
 - **Tag System**: Organize articles with tags
 - **User Roles**: Writer and Editor roles for content management
 - **User Authentication**: Custom user model with role-based permissions
@@ -84,6 +85,7 @@ The API will be available at `http://127.0.0.1:8000/`
 
 ## API Endpoints
 
+> Note: endpoints for liking articles and comments have been added as part of the like system.
 ### Base URL
 ```
 http://127.0.0.1:8000/api/
@@ -96,6 +98,8 @@ http://127.0.0.1:8000/api/
 GET /api/content/
 ```
 
+The article objects now include `like_count` and `liked` fields for tracking like totals and whether the requesting user has liked the article.
+
 **Response** (200 OK):
 ```json
 [
@@ -107,11 +111,12 @@ GET /api/content/
     "author": 1,
     "tags": [1, 2],
     "created_at": "2026-02-26T10:00:00Z",
-    "updated_at": "2026-02-26T10:30:00Z"
+    "updated_at": "2026-02-26T10:30:00Z",
+    "like_count": 5,
+    "liked": false
   }
 ]
 ```
-
 #### Create a new article
 ```
 POST /api/content/
@@ -157,7 +162,9 @@ GET /api/content/{id}/
   "author": 1,
   "tags": [1, 2],
   "created_at": "2026-02-26T10:00:00Z",
-  "updated_at": "2026-02-26T10:30:00Z"
+  "updated_at": "2026-02-26T10:30:00Z",
+  "like_count": 5,
+  "liked": false
 }
 ```
 
@@ -194,11 +201,32 @@ PATCH /api/content/{id}/
 
 **Response** (200 OK): Updated article object
 
+### Article Likes
+
+#### Like an article
+```
+POST /api/content/{id}/like/
+```
+
+**Response** (200 OK):
+```json
+{ "status": "liked" }
+```
+
+#### Unlike an article
+```
+POST /api/content/{id}/unlike/
+```
+
+**Response** (200 OK):
+```json
+{ "status": "unliked" }
+```
+
 #### Delete an article
 ```
 DELETE /api/content/{id}/
 ```
-
 ---
 
 ### Comments

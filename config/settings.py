@@ -162,3 +162,4 @@ cloudinary.config(
   	api_secret = os.getenv('CLOUDINARY_API_SECRET')
 )
 DEFAULT_FILE_STORAGE = "cloudinary_storage.storage.MediaCloudinaryStorage"
+SITE_ID = 1 

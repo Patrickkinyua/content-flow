@@ -40,3 +40,25 @@ class Comment(models.Model):
 
     def __str__(self):
         return f"{self.author} on {self.article}"
+
+
+class CommentLike(models.Model):
+    """A record that a user liked a comment."""
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="comment_likes"
+    )
+    comment = models.ForeignKey(
+        Comment,
+        on_delete=models.CASCADE,
+        related_name="likes"
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ("user", "comment")
+        ordering = ["-created_at"]
+
+    def __str__(self):
+        return f"{self.user} likes {self.comment}"

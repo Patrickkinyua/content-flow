@@ -1,8 +1,10 @@
 from rest_framework.viewsets import ModelViewSet
-from rest_framework.permissions import IsAuthenticatedOrReadOnly
+from rest_framework.permissions import IsAuthenticatedOrReadOnly, IsAuthenticated
 from django.db.models import Prefetch
+from rest_framework.decorators import action
+from rest_framework.response import Response
 from .serializers import CommentSerializer
-from .models import Comment
+from .models import Comment, CommentLike
 from .permissions import IsAuthorOrReadOnly
 
 class CommentViewSet(ModelViewSet):
@@ -32,3 +34,17 @@ class CommentViewSet(ModelViewSet):
         instance.is_deleted = True
         instance.content = "[deleted]"
         instance.save()
+
+    @action(detail=True, methods=["post"], permission_classes=[IsAuthenticated])
+    def like(self, request, pk=None, article_pk=None):
+        obj = self.get_object()
+        like, created = CommentLike.objects.get_or_create(user=request.user, comment=obj)
+        if created:
+            return Response({"status": "liked"})
+        return Response({"status": "already liked"})
+
+    @action(detail=True, methods=["post"], permission_classes=[IsAuthenticated])
+    def unlike(self, request, pk=None, article_pk=None):
+        obj = self.get_object()
+        CommentLike.objects.filter(user=request.user, comment=obj).delete()
+        return Response({"status": "unliked"})
